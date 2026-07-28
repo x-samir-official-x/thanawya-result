@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتيجة الثانوية العامة</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- الأشكال المتحركة في الخلفية -->
+    <div class="bg-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container">
+        <h1>الاستعلام عن النتيجة</h1>
+        <p>قم بإدخال رقم الجلوس الخاص بك للحصول على النتيجة فوراً</p>
+        
+        <form class="search-box" id="searchForm">
+            <input type="number" id="seatingInput" placeholder="أدخل رقم الجلوس هنا..." required>
+            <button type="submit">بحث</button>
+        </form>
+
+        <div class="loader" id="loader"></div>
+        <div class="error-msg" id="errorMsg"></div>
+
+        <div class="result-card" id="resultCard">
+            <div class="result-item">الاسم: <span id="resName"></span></div>
+            <div class="result-item">رقم الجلوس: <span id="resSeating"></span></div>
+            <div class="result-item">المجموع: <span id="resDegree"></span></div>
+        </div>
+    </div>
+
+    <!-- التوقيع الخاص بك (تصميم بارز واحترافي) -->
+    <div class="designer-badge">
+        <span class="badge-title">UI/UX & Development by</span>
+        <strong class="badge-name">Samir Sayed Eid</strong>
+    </div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const seatingNo = document.getElementById('seatingInput').value;
+            const resultCard = document.getElementById('resultCard');
+            const errorMsg = document.getElementById('errorMsg');
+            const loader = document.getElementById('loader');
+            
+            resultCard.style.display = 'none';
+            errorMsg.style.display = 'none';
+            loader.style.display = 'block';
+
+            try {
+                const response = await fetch(`/api/result/${seatingNo}`);
+                const data = await response.json();
+                
+                loader.style.display = 'none';
+
+                if (data.success) {
+                    document.getElementById('resName').textContent = data.data.name;
+                    document.getElementById('resSeating').textContent = seatingNo;
+                    document.getElementById('resDegree').textContent = data.data.degree;
+                    resultCard.style.display = 'block';
+                } else {
+                    errorMsg.textContent = data.message;
+                    errorMsg.style.display = 'block';
+                }
+            } catch (err) {
+                loader.style.display = 'none';
+                errorMsg.textContent = 'حدث خطأ في الاتصال بالسيرفر. يرجى المحاولة لاحقاً.';
+                errorMsg.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
